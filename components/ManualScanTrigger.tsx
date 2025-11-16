@@ -12,7 +12,7 @@ export default function ManualScanTrigger() {
   const [logs, setLogs] = useState<string[]>([]);
   const [currentTask, setCurrentTask] = useState<'mass' | 'forecast' | null>(null);
 
-  const CORRECT_PASSWORD_HASH = '5a3e8d7c2b1f9e4d6a8c7b3e2a5d9c1f8e7a6b4c3d2e1f9a8b7c6d5e4f3a2b1c0'; // SHA-256 hash of "dhruv1"
+  const CORRECT_PASSWORD_HASH = 'ea4de091b760a4e538140c342585130649e646c54d4939ae7f142bb81d5506fa'; 
 
   const handleButtonClick = () => {
     if (!isAuthenticated) {

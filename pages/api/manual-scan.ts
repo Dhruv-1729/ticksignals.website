@@ -47,7 +47,7 @@ export default async function handler(
     `);
 
     const tickers = tickersResult.rows.map((row: any) => row.Ticker);
-    sendLog(res, `📊 Found ${tickers.length} tickers to process`);
+    sendLog(res, ` Found ${tickers.length} tickers to process`);
 
     if (scanType === 'mass') {
       sendLog(res, '\n--- MASS RUN: Processing Signals ---');
@@ -69,11 +69,11 @@ export default async function handler(
         // - Generate signals using your algorithm
         // - Store in database
         
-        sendLog(res, `  ✅ ${ticker} complete`);
+        sendLog(res, `   ${ticker} complete`);
       }
       
-      sendLog(res, '\n✅ Mass Run Complete!');
-      sendLog(res, `📝 Processed ${tickers.length} tickers`);
+      sendLog(res, '\nMass Run Complete!');
+      sendLog(res, ` Processed ${tickers.length} tickers`);
       
     } else {
       sendLog(res, '\n--- FORECAST RUN: Generating Predictions ---');
@@ -95,14 +95,14 @@ export default async function handler(
         // Simulate finding forecasts for some tickers
         if (Math.random() > 0.7) {
           forecastCount++;
-          sendLog(res, `  🎯 ${ticker} - BUY_FORECAST (75% confidence)`);
+          sendLog(res, `   ${ticker} - BUY_FORECAST (75% confidence)`);
         } else {
-          sendLog(res, `  ⚪ ${ticker} - Neutral`);
+          sendLog(res, `   ${ticker} - Neutral`);
         }
       }
       
-      sendLog(res, '\n✅ Forecast Run Complete!');
-      sendLog(res, `📝 Generated ${forecastCount} forecast signals`);
+      sendLog(res, '\n Forecast Run Complete!');
+      sendLog(res, ` Generated ${forecastCount} forecast signals`);
     }
 
     await client.end();
