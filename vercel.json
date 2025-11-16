@@ -3,10 +3,6 @@
   "devCommand": "npm run dev",
   "framework": "nextjs",
   "regions": ["iad1"],
-  "env": {
-    "DATABASE_URL": "@database-url",
-    "NEON_DATABASE_URL": "@neon-database-url"
-  },
   "headers": [
     {
       "source": "/api/(.*)",
