@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Pool } from 'pg';
+import pool from '../../lib/db'; // <-- Import the shared pool
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,9 +9,7 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  });
+  // Do NOT create a new pool here
 
   try {
     // Get unique ticker count from signals
@@ -20,13 +18,13 @@ export default async function handler(
       FROM all_signals
     `);
 
-    await pool.end();
+    // DO NOT call pool.end()
     
     const count = result.rows[0]?.count || 0;
     res.status(200).json({ activeSignals: count });
   } catch (error) {
     console.error('Stats fetch error:', error);
-    await pool.end();
+    // DO NOT call pool.end()
     res.status(500).json({ error: 'Failed to fetch stats' });
   }
 }
