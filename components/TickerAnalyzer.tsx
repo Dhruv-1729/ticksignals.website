@@ -46,7 +46,7 @@ export default function TickerAnalyzer() {
               value={ticker}
               onChange={(e) => setTicker(e.target.value.toUpperCase())}
               onKeyPress={(e) => e.key === 'Enter' && analyzeStock()}
-              placeholder="Enter ticker symbol (e.g., AAPL, TSLA, MSFT)"
+              placeholder="Enter ticker symbol"
               className="w-full bg-gray-900/50 border border-gray-700 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 focus:border-transparent transition-all"
             />
           </div>

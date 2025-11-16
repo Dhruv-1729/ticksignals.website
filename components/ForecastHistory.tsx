@@ -21,6 +21,14 @@ export default function ForecastHistory() {
     }
   };
 
+  const formatDate = (dateStr: string) => {
+    // Handle ISO format dates
+    if (dateStr.includes('T')) {
+      return dateStr.split('T')[0];
+    }
+    return dateStr;
+  };
+
   const getSignalBadge = (signal: string) => {
     const isStrong = signal.includes('STRONG');
     const isBuy = signal.includes('BUY');
@@ -75,7 +83,7 @@ export default function ForecastHistory() {
                     <td className="py-3 px-4">
                       <span className="font-bold text-aquamarine-400">{forecast.Ticker}</span>
                     </td>
-                    <td className="py-3 px-4 text-gray-300">{forecast.Date}</td>
+                    <td className="py-3 px-4 text-gray-300">{formatDate(forecast.Date)}</td>
                     <td className="py-3 px-4">
                       {getSignalBadge(forecast.Forecast_Signal)}
                     </td>

@@ -27,6 +27,14 @@ export default function SignalsHistory() {
     return signal.Signal.toLowerCase() === filter;
   });
 
+  const formatDate = (dateStr: string) => {
+    // Handle ISO format dates
+    if (dateStr.includes('T')) {
+      return dateStr.split('T')[0];
+    }
+    return dateStr;
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
@@ -70,7 +78,7 @@ export default function SignalsHistory() {
                     <td className="py-3 px-4">
                       <span className="font-bold text-aquamarine-400">{signal.Ticker}</span>
                     </td>
-                    <td className="py-3 px-4 text-gray-300">{signal.Date}</td>
+                    <td className="py-3 px-4 text-gray-300">{formatDate(signal.Date)}</td>
                     <td className="py-3 px-4">
                       <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
                         signal.Signal === 'Buy' 
