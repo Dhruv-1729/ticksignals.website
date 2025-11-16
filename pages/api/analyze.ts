@@ -18,30 +18,37 @@ export default async function handler(
     }
 
     // Fetch stock quote data
-    const quote = await yahooFinance.quote(ticker);
+    const quote: any = await yahooFinance.quote(ticker);
     
     // Fetch historical data (1 year)
     const endDate = new Date();
     const startDate = new Date();
     startDate.setFullYear(startDate.getFullYear() - 1);
     
-    const historicalData = await yahooFinance.historical(ticker, {
+    const historicalData: any = await yahooFinance.historical(ticker, {
       period1: startDate,
       period2: endDate,
       interval: '1d',
     });
 
     // Format chart data for Plotly
-    const chartDates = historicalData.map(d => d.date.toISOString().split('T')[0]);
-    const chartPrices = historicalData.map(d => d.close);
+    const chartDates = historicalData.map((d: any) => d.date.toISOString().split('T')[0]);
+    const chartPrices = historicalData.map((d: any) => d.close);
 
     // Fetch signals for this ticker from database
     const client = new Client({
       connectionString: process.env.DATABASE_URL,
     });
 
-    let signals = [];
-    let forecast = null;
+    interface Signal {
+      date: string;
+      type: string;
+      price: string;
+      Date: Date;
+    }
+
+    let signals: Signal[] = [];
+    let forecast: any = null;
 
     try {
       await client.connect();
@@ -55,10 +62,10 @@ export default async function handler(
         LIMIT 10
       `, [ticker.toUpperCase()]);
 
-      signals = signalsResult.rows.map(row => ({
+      signals = signalsResult.rows.map((row: any) => ({
         date: new Date(row.Date).toISOString().split('T')[0],
         type: row.Signal,
-        price: `$${row.Price.toFixed(2)}`,
+        price: `${row.Price.toFixed(2)}`,
         Date: row.Date
       }));
 
@@ -95,15 +102,15 @@ export default async function handler(
 
     // Format market cap
     const formatMarketCap = (value: number) => {
-      if (value >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
-      if (value >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
-      if (value >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
-      return `$${value.toLocaleString()}`;
+      if (value >= 1e12) return `${(value / 1e12).toFixed(2)}T`;
+      if (value >= 1e9) return `${(value / 1e9).toFixed(2)}B`;
+      if (value >= 1e6) return `${(value / 1e6).toFixed(2)}M`;
+      return `${value.toLocaleString()}`;
     };
 
     const responseData = {
       ticker: ticker.toUpperCase(),
-      price: `$${quote.regularMarketPrice?.toFixed(2) || 'N/A'}`,
+      price: `${quote.regularMarketPrice?.toFixed(2) || 'N/A'}`,
       marketCap: quote.marketCap ? formatMarketCap(quote.marketCap) : 'N/A',
       volume: quote.regularMarketVolume ? quote.regularMarketVolume.toLocaleString() : 'N/A',
       peRatio: quote.trailingPE ? quote.trailingPE.toFixed(2) : 'N/A',
