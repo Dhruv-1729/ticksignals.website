@@ -5,6 +5,7 @@ import Layout from '../components/Layout';
 import TickerAnalyzer from '../components/TickerAnalyzer';
 import SignalsHistory from '../components/SignalsHistory';
 import ForecastHistory from '../components/ForecastHistory';
+import ManualScanTrigger from '../components/ManualScanTrigger';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('analyzer');
@@ -94,6 +95,9 @@ export default function Home() {
             {activeTab === 'forecast' && <ForecastHistory />}
           </div>
         </div>
+
+        {/* Manual Scan Trigger */}
+        <ManualScanTrigger />
       </Layout>
     </>
   );
