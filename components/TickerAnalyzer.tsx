@@ -115,22 +115,40 @@ export default function TickerAnalyzer() {
                   ...stockData.chart.layout,
                   paper_bgcolor: 'rgba(17, 24, 39, 0)',
                   plot_bgcolor: 'rgba(17, 24, 39, 0)',
-                  font: { color: '#9CA3AF', family: 'Inter, sans-serif' },
+                  font: { color: '#9CA3AF', family: 'Inter, sans-serif', size: 12 },
                   xaxis: {
                     ...stockData.chart.layout?.xaxis,
                     gridcolor: '#374151',
                     showgrid: true,
                     zeroline: false,
+                    showspikes: true,
+                    spikecolor: '#9CA3AF',
+                    spikethickness: 1,
+                    spikemode: 'across',
+                    spikedash: 'solid',
                   },
                   yaxis: {
                     ...stockData.chart.layout?.yaxis,
                     gridcolor: '#374151',
                     showgrid: true,
                     zeroline: false,
+                    showspikes: true,
+                    spikecolor: '#9CA3AF',
+                    spikethickness: 1,
+                    spikemode: 'across',
+                    spikedash: 'solid',
                   },
                   margin: { l: 60, r: 30, t: 30, b: 60 },
                   hovermode: 'x unified',
                   dragmode: 'pan',
+                  hoverlabel: {
+                    bgcolor: 'rgba(17, 24, 39, 0.95)',
+                    bordercolor: '#14b8a6',
+                    font: { color: '#F3F4F6', family: 'Inter, sans-serif', size: 11 },
+                    align: 'left',
+                    namelength: -1,
+                  },
+                  showlegend: false,
                 }}
                 config={{ 
                   responsive: true,
@@ -138,6 +156,7 @@ export default function TickerAnalyzer() {
                   displaylogo: false,
                   modeBarButtonsToRemove: ['lasso2d', 'select2d'],
                   scrollZoom: true,
+                  doubleClick: 'reset',
                 }}
                 style={{ width: '100%', height: '500px' }}
               />
@@ -146,11 +165,22 @@ export default function TickerAnalyzer() {
 
           {/* Forecast Analysis - Only if exists and recent */}
           {stockData.forecast && stockData.forecast.isRecent && (
-            <div className="bg-gradient-to-br from-aquamarine-500/10 to-cyan-500/10 rounded-xl p-6 border border-aquamarine-500/30">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Activity className="text-aquamarine-400" size={24} />
-                Forecast Analysis
-              </h3>
+            <div className="bg-gradient-to-br from-aquamarine-500/10 to-cyan-500/10 rounded-xl p-6 border border-aquamarine-500/30 relative">
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Activity className="text-aquamarine-400" size={24} />
+                  Forecast Analysis
+                </h3>
+                {stockData.forecast.date && (
+                  <p className="text-gray-400 text-sm">
+                    {new Date(stockData.forecast.date).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric', 
+                      year: 'numeric' 
+                    })}
+                  </p>
+                )}
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-300">
                 <div>
                   <p className="text-gray-400 text-sm mb-1">Signal</p>

@@ -36,6 +36,13 @@ export default async function handler(
     // Format chart data for Plotly
     const chartDates = historicalData.map((d: any) => d.date.toISOString().split('T')[0]);
     const chartPrices = historicalData.map((d: any) => d.close);
+    
+    // Create a map of dates to prices for signal positioning
+    const dateToPriceMap: { [key: string]: number } = {};
+    historicalData.forEach((d: any, idx: number) => {
+      const dateStr = d.date.toISOString().split('T')[0];
+      dateToPriceMap[dateStr] = d.close;
+    });
 
     // Fetch signals for this ticker from database
     const client = new Client({
@@ -64,12 +71,37 @@ export default async function handler(
         LIMIT 10
       `, [ticker.toUpperCase()]);
 
-      signals = signalsResult.rows.map((row: any) => ({
-        date: new Date(row.Date).toISOString().split('T')[0],
-        type: row.Signal,
-        price: `${row.Price.toFixed(2)}`,
-        Date: row.Date
-      }));
+      signals = signalsResult.rows.map((row: any) => {
+        const signalDate = new Date(row.Date).toISOString().split('T')[0];
+        // Find the closest price from historical data
+        let signalPrice = dateToPriceMap[signalDate];
+        let chartDate = signalDate;
+        
+        // If exact date not found, find the closest date
+        if (!signalPrice) {
+          const signalDateObj = new Date(signalDate);
+          let closestDate = chartDates[0];
+          let minDiff = Math.abs(new Date(chartDates[0]).getTime() - signalDateObj.getTime());
+          
+          for (const date of chartDates) {
+            const diff = Math.abs(new Date(date).getTime() - signalDateObj.getTime());
+            if (diff < minDiff) {
+              minDiff = diff;
+              closestDate = date;
+            }
+          }
+          chartDate = closestDate;
+          signalPrice = dateToPriceMap[closestDate] || row.Price;
+        }
+        
+        return {
+          date: chartDate,
+          type: row.Signal,
+          price: `${row.Price.toFixed(2)}`,
+          Date: row.Date,
+          chartPrice: signalPrice
+        };
+      });
 
       // Check for recent forecast (last 30 days)
       const forecastResult = await client.query(`
@@ -91,6 +123,7 @@ export default async function handler(
           signal: f.Forecast_Signal.replace('_FORECAST', '').replace('_', ' '),
           confidence: f['Confidence_%'],
           days: f.Days_To_Crossover.toFixed(1),
+          date: new Date(f.Date).toISOString().split('T')[0],
           isRecent: true
         };
       }
@@ -110,6 +143,10 @@ export default async function handler(
       return `${value.toLocaleString()}`;
     };
 
+    // Prepare signal markers for chart
+    const buySignals = signals.filter((s: any) => s.type.includes('Buy'));
+    const sellSignals = signals.filter((s: any) => s.type.includes('Sell'));
+    
     const responseData = {
       ticker: ticker.toUpperCase(),
       price: `${quote.regularMarketPrice?.toFixed(2) || 'N/A'}`,
@@ -125,7 +162,44 @@ export default async function handler(
             mode: 'lines',
             name: `${ticker.toUpperCase()} Price`,
             line: { color: '#14b8a6', width: 2 },
+            hovertemplate: '<b>%{fullData.name}</b><br>Date: %{x}<br>Price: $%{y:.2f}<extra></extra>',
           },
+          // Buy signals (green up arrows)
+          ...(buySignals.length > 0 ? [{
+            x: buySignals.map((s: any) => s.date),
+            y: buySignals.map((s: any) => s.chartPrice),
+            type: 'scatter',
+            mode: 'markers+text',
+            name: 'Buy Signals',
+            marker: {
+              symbol: 'triangle-up',
+              size: 12,
+              color: '#10b981',
+              line: { color: '#10b981', width: 1 }
+            },
+            text: '',
+            textposition: 'top center',
+            hovertemplate: '<b>Buy Signal</b><br>Date: %{x}<br>Price: $%{y:.2f}<extra></extra>',
+            showlegend: false,
+          }] : []),
+          // Sell signals (red down arrows)
+          ...(sellSignals.length > 0 ? [{
+            x: sellSignals.map((s: any) => s.date),
+            y: sellSignals.map((s: any) => s.chartPrice),
+            type: 'scatter',
+            mode: 'markers+text',
+            name: 'Sell Signals',
+            marker: {
+              symbol: 'triangle-down',
+              size: 12,
+              color: '#ef4444',
+              line: { color: '#ef4444', width: 1 }
+            },
+            text: '',
+            textposition: 'bottom center',
+            hovertemplate: '<b>Sell Signal</b><br>Date: %{x}<br>Price: $%{y:.2f}<extra></extra>',
+            showlegend: false,
+          }] : []),
         ],
         layout: {
           title: `${quote.shortName || ticker.toUpperCase()} - 1 Year Chart`,

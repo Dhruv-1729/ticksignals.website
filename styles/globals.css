@@ -69,3 +69,35 @@
 .js-plotly-plot .plotly .modebar-btn {
   @apply text-gray-400 hover:text-aquamarine-400;
 }
+
+/* Sleek hover line styling (Robinhood-style) */
+.js-plotly-plot .plotly .spikeline {
+  stroke: #14b8a6 !important;
+  stroke-width: 1.5px !important;
+  opacity: 0.8 !important;
+  stroke-dasharray: none !important;
+}
+
+.js-plotly-plot .plotly .hoverlayer {
+  pointer-events: none;
+}
+
+.js-plotly-plot .plotly .hovertext {
+  background-color: rgba(17, 24, 39, 0.95) !important;
+  border: 1px solid #14b8a6 !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 11px !important;
+  font-family: 'Inter', sans-serif !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+.js-plotly-plot .plotly .xtick,
+.js-plotly-plot .plotly .ytick {
+  stroke: #374151 !important;
+}
+
+.js-plotly-plot .plotly .gridlayer path {
+  stroke: #374151 !important;
+  stroke-width: 0.5px !important;
+}
