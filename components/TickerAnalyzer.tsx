@@ -184,7 +184,7 @@ export default function TickerAnalyzer() {
                   <tbody>
                     {stockData.signals.map((signal: any, idx: number) => (
                       <tr key={idx} className="border-b border-gray-800/50 hover:bg-gray-700/30 transition-colors">
-                        <td className="py-3 px-4 text-gray-300">{signal.date}</td>
+                        <td className="py-3 px-4 text-gray-300">{new Date(signal.Date).toLocaleDateString()}</td>
                         <td className="py-3 px-4">
                           <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
                             signal.type.includes('Buy') 
