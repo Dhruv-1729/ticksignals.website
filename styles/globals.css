@@ -70,12 +70,17 @@
   @apply text-gray-400 hover:text-aquamarine-400;
 }
 
-/* Sleek hover line styling (Robinhood-style) */
+/* Sleek hover line styling (Robinhood-style) - vertical only */
 .js-plotly-plot .plotly .spikeline {
   stroke: #14b8a6 !important;
   stroke-width: 1.5px !important;
   opacity: 0.8 !important;
   stroke-dasharray: none !important;
+}
+
+/* Hide horizontal spike lines */
+.js-plotly-plot .plotly .yaxislayer-above .spikeline {
+  display: none !important;
 }
 
 .js-plotly-plot .plotly .hoverlayer {

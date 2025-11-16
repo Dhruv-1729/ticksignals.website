@@ -22,10 +22,10 @@ export default async function handler(
     // Fetch stock quote data
     const quote: any = await yahooFinance.quote(ticker);
     
-    // Fetch historical data (1 year)
+    // Fetch historical data (10 years)
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 1);
+    startDate.setFullYear(startDate.getFullYear() - 10);
     
     const historicalData: any = await yahooFinance.historical(ticker, {
       period1: startDate,
@@ -202,8 +202,15 @@ export default async function handler(
           }] : []),
         ],
         layout: {
-          title: `${quote.shortName || ticker.toUpperCase()} - 1 Year Chart`,
-          xaxis: { title: 'Date' },
+          title: `${quote.shortName || ticker.toUpperCase()} - 10 Year Chart`,
+          xaxis: { 
+            title: 'Date',
+            // Default to showing last 1 year, but allow zooming to see full 10 years
+            range: chartDates.length > 0 ? [
+              chartDates[Math.max(0, chartDates.length - 252)], // ~1 year ago (252 trading days)
+              chartDates[chartDates.length - 1] // Today
+            ] : undefined
+          },
           yaxis: { title: 'Price (USD)' },
           autosize: true,
         },
