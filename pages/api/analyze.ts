@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import yahooFinance from 'yahoo-finance2';
+const yahooFinance = require('yahoo-finance2').default;
 import { Client } from 'pg';
 
 export default async function handler(
