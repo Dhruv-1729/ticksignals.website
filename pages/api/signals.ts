@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import pool from '../../lib/db'; // <-- Import the shared pool
+import { Client } from 'pg'; // <-- Use Client
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,10 +9,14 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Do NOT create a new pool here
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+  });
 
   try {
-    const result = await pool.query(`
+    await client.connect(); // <-- Connect
+
+    const result = await client.query(`
       SELECT 
         "Date", 
         "Ticker", 
@@ -24,12 +28,12 @@ export default async function handler(
       LIMIT 100
     `);
 
-    // DO NOT call pool.end()
+    await client.end(); // <-- Disconnect
     
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Signals fetch error:', error);
-    // DO NOT call pool.end()
+    await client.end(); // <-- Ensure disconnect on error
     res.status(500).json({ error: 'Failed to fetch signals' });
   }
 }
