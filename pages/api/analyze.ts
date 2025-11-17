@@ -37,6 +37,20 @@ export default async function handler(
     const chartDates = historicalData.map((d: any) => d.date.toISOString().split('T')[0]);
     const chartPrices = historicalData.map((d: any) => d.close);
     
+    // Calculate price range for y-axis (with 10% padding)
+    const minPrice = Math.min(...chartPrices);
+    const maxPrice = Math.max(...chartPrices);
+    const priceRange = maxPrice - minPrice;
+    const yAxisMin = Math.max(0, minPrice - priceRange * 0.1); // Don't go below 0
+    const yAxisMax = maxPrice + priceRange * 0.1;
+    
+    // Calculate date constraints (10 years ago to now)
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setFullYear(startDate.getFullYear() - 10);
+    const minDate = startDate.toISOString().split('T')[0];
+    const maxDate = endDate.toISOString().split('T')[0];
+    
     // Create a map of dates to prices for signal positioning
     const dateToPriceMap: { [key: string]: number } = {};
     historicalData.forEach((d: any, idx: number) => {
@@ -205,14 +219,29 @@ export default async function handler(
           title: `${quote.shortName || ticker.toUpperCase()} - 10 Year Chart`,
           xaxis: { 
             title: 'Date',
-            // Default to showing last 1 year, but allow zooming to see full 10 years
+            type: 'date',
+            // Default to showing last 1 year
             range: chartDates.length > 0 ? [
               chartDates[Math.max(0, chartDates.length - 252)], // ~1 year ago (252 trading days)
               chartDates[chartDates.length - 1] // Today
-            ] : undefined
+            ] : undefined,
+            // Constrain to 10 years max
+            rangebreaks: [],
+            autorange: false,
           },
-          yaxis: { title: 'Price (USD)' },
+          yaxis: { 
+            title: 'Price (USD)',
+            autorange: true, // Auto-scale based on visible data
+            fixedrange: false, // Allow zooming
+          },
           autosize: true,
+          // Store constraints for client-side enforcement
+          _constraints: {
+            xMin: minDate,
+            xMax: maxDate,
+            yMin: yAxisMin,
+            yMax: yAxisMax,
+          },
         },
       },
       forecast: forecast,
