@@ -14,8 +14,6 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Import your existing functions from the main script
-# (We'll structure this better below)
 
 def get_db_connection():
     """Creates a SQLAlchemy engine for PostgreSQL connection"""

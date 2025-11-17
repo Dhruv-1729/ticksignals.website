@@ -3,6 +3,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 // Railway Python service URL (set in Vercel environment variables)
 const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || 'http://localhost:5000';
 
+// Ensure URL has protocol
+function normalizeUrl(url: string): string {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`;
+  }
+  return url;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -25,7 +33,8 @@ export default async function handler(
 
     // Determine the Railway endpoint
     const endpoint = scanType === 'mass' ? '/scan/mass' : '/scan/forecast';
-    const railwayUrl = `${PYTHON_SERVICE_URL}${endpoint}`;
+    const baseUrl = normalizeUrl(PYTHON_SERVICE_URL);
+    const railwayUrl = `${baseUrl}${endpoint}`;
 
     console.log(`Calling Railway: ${railwayUrl}`);
 
