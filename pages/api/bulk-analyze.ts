@@ -133,8 +133,7 @@ export default async function handler(
     // Send error as SSE
     res.write(`data: ${JSON.stringify({ 
       error: error.message || 'Failed to process bulk analysis',
-      complete: true,
-      error: true 
+      complete: true
     })}\n\n`);
     
     res.end();
