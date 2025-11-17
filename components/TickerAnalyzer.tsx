@@ -85,7 +85,7 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
             />
           </div>
           <button
-            onClick={analyzeStock}
+            onClick={() => analyzeStock()}
             disabled={loading || !ticker}
             className="px-8 py-4 bg-gradient-to-r from-aquamarine-600 to-cyan-600 text-white font-medium rounded-lg hover:from-aquamarine-500 hover:to-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-aquamarine-500/30"
           >
