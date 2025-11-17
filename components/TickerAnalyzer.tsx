@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, TrendingUp, TrendingDown, DollarSign, Activity, AlertCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import CustomTickerUpload from './CustomTickerUpload';
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
 
@@ -73,7 +72,7 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
     <div className="space-y-6">
       {/* Search Bar */}
       <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
-        <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center">
+        <div className="flex gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -85,18 +84,13 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
               className="w-full bg-gray-900/50 border border-gray-700 rounded-lg pl-12 pr-4 py-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 focus:border-transparent transition-all"
             />
           </div>
-          <div className="flex gap-3 items-center">
-            <button
-              onClick={() => analyzeStock()}
-              disabled={loading || !ticker}
-              className="flex-1 md:flex-none px-8 py-4 bg-gradient-to-r from-aquamarine-600 to-cyan-600 text-white font-medium rounded-lg hover:from-aquamarine-500 hover:to-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-aquamarine-500/30"
-            >
-              {loading ? 'Analyzing...' : 'Analyze'}
-            </button>
-            <div className="border-l border-gray-700 pl-3 md:pl-4">
-              <CustomTickerUpload />
-            </div>
-          </div>
+          <button
+            onClick={() => analyzeStock()}
+            disabled={loading || !ticker}
+            className="px-8 py-4 bg-gradient-to-r from-aquamarine-600 to-cyan-600 text-white font-medium rounded-lg hover:from-aquamarine-500 hover:to-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-aquamarine-500/30"
+          >
+            {loading ? 'Analyzing...' : 'Analyze'}
+          </button>
         </div>
       </div>
 

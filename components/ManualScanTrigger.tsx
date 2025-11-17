@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Play, Lock, X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Play, Lock, X, Loader2, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 import crypto from 'crypto-js';
+import CustomTickerUpload from './CustomTickerUpload';
 
 export default function ManualScanTrigger() {
   const [isOpen, setIsOpen] = useState(false);
@@ -163,36 +164,55 @@ export default function ManualScanTrigger() {
 
           {/* Content */}
           {!isRunning && logs.length === 0 ? (
-            <div className="flex-1 p-4 space-y-3">
-              <button
-                onClick={() => runScan('mass')}
-                className="w-full bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-lg p-4 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-aquamarine-500/10 rounded-lg group-hover:bg-aquamarine-500/20 transition-colors">
-                    <Play className="text-aquamarine-400" size={20} />
+            <div className="flex-1 p-4 space-y-3 flex flex-col">
+              <div className="space-y-3 flex-1">
+                <button
+                  onClick={() => runScan('mass')}
+                  className="w-full bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-lg p-4 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-aquamarine-500/10 rounded-lg group-hover:bg-aquamarine-500/20 transition-colors">
+                      <Play className="text-aquamarine-400" size={20} />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="font-semibold text-white">Mass Run</h4>
+                      <p className="text-sm text-gray-400">Process all tickers and generate signals</p>
+                    </div>
                   </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold text-white">Mass Run</h4>
-                    <p className="text-sm text-gray-400">Process all tickers and generate signals</p>
-                  </div>
-                </div>
-              </button>
+                </button>
 
-              <button
-                onClick={() => runScan('forecast')}
-                className="w-full bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-lg p-4 transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-cyan-500/10 rounded-lg group-hover:bg-cyan-500/20 transition-colors">
-                    <Play className="text-cyan-400" size={20} />
+                <button
+                  onClick={() => runScan('forecast')}
+                  className="w-full bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-lg p-4 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-cyan-500/10 rounded-lg group-hover:bg-cyan-500/20 transition-colors">
+                      <Play className="text-cyan-400" size={20} />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="font-semibold text-white">Forecast Run</h4>
+                      <p className="text-sm text-gray-400">Generate predictive forecast signals</p>
+                    </div>
                   </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold text-white">Forecast Run</h4>
-                    <p className="text-sm text-gray-400">Generate predictive forecast signals</p>
-                  </div>
-                </div>
-              </button>
+                </button>
+              </div>
+              
+              {/* Upload Custom Tickers - Bottom Left */}
+              <div className="pt-3 border-t border-gray-700">
+                <CustomTickerUpload
+                  triggerButton={
+                    <button className="w-full flex items-center gap-2 px-3 py-2 bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600 rounded-lg transition-all text-left group">
+                      <div className="p-2 bg-aquamarine-500/10 rounded-lg group-hover:bg-aquamarine-500/20 transition-colors">
+                        <Upload className="text-aquamarine-400" size={16} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs font-medium text-white">Upload Custom Tickers</p>
+                        <p className="text-xs text-gray-400">Bulk analyze your ticker list</p>
+                      </div>
+                    </button>
+                  }
+                />
+              </div>
             </div>
           ) : (
             <div className="flex-1 flex flex-col overflow-hidden">

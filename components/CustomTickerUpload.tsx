@@ -8,7 +8,12 @@ interface TickerResult {
   error?: string;
 }
 
-export default function CustomTickerUpload() {
+interface CustomTickerUploadProps {
+  triggerButton?: React.ReactNode;
+  compact?: boolean;
+}
+
+export default function CustomTickerUpload({ triggerButton, compact = false }: CustomTickerUploadProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [tickers, setTickers] = useState<string[]>([]);
@@ -226,14 +231,20 @@ export default function CustomTickerUpload() {
   return (
     <>
       {/* Trigger Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="inline-flex items-center gap-2 px-3 md:px-4 py-2 bg-gradient-to-r from-aquamarine-600 to-cyan-600 text-white font-medium rounded-lg hover:from-aquamarine-500 hover:to-cyan-500 transition-all shadow-lg shadow-aquamarine-500/30 text-sm md:text-base whitespace-nowrap"
-      >
-        <Upload size={16} className="md:w-[18px] md:h-[18px]" />
-        <span className="hidden sm:inline">Upload Custom Tickers</span>
-        <span className="sm:hidden">Upload</span>
-      </button>
+      {triggerButton ? (
+        <div onClick={() => setIsOpen(true)}>
+          {triggerButton}
+        </div>
+      ) : (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="inline-flex items-center gap-2 px-3 md:px-4 py-2 bg-gradient-to-r from-aquamarine-600 to-cyan-600 text-white font-medium rounded-lg hover:from-aquamarine-500 hover:to-cyan-500 transition-all shadow-lg shadow-aquamarine-500/30 text-sm md:text-base whitespace-nowrap"
+        >
+          <Upload size={16} className="md:w-[18px] md:h-[18px]" />
+          <span className="hidden sm:inline">Upload Custom Tickers</span>
+          <span className="sm:hidden">Upload</span>
+        </button>
+      )}
 
       {/* Modal */}
       {isOpen && (
