@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Filter } from 'lucide-react';
 
-export default function SignalsHistory() {
+interface SignalsHistoryProps {
+  onTickerClick?: (ticker: string) => void;
+}
+
+export default function SignalsHistory({ onTickerClick }: SignalsHistoryProps) {
   const [signals, setSignals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -76,7 +80,12 @@ export default function SignalsHistory() {
                 {filteredSignals.map((signal: any, idx) => (
                   <tr key={idx} className="border-b border-gray-800/50 hover:bg-gray-700/30 transition-colors">
                     <td className="py-3 px-4">
-                      <span className="font-bold text-aquamarine-400">{signal.Ticker}</span>
+                      <button
+                        onClick={() => onTickerClick?.(signal.Ticker)}
+                        className="font-bold text-aquamarine-400 hover:text-aquamarine-300 hover:underline cursor-pointer transition-colors"
+                      >
+                        {signal.Ticker}
+                      </button>
                     </td>
                     <td className="py-3 px-4 text-gray-300">{formatDate(signal.Date)}</td>
                     <td className="py-3 px-4">

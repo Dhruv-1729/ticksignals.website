@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Activity, Star, TrendingUp, TrendingDown } from 'lucide-react';
 
-export default function ForecastHistory() {
+interface ForecastHistoryProps {
+  onTickerClick?: (ticker: string) => void;
+}
+
+export default function ForecastHistory({ onTickerClick }: ForecastHistoryProps) {
   const [forecasts, setForecasts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -81,7 +85,12 @@ export default function ForecastHistory() {
                 {forecasts.map((forecast: any, idx) => (
                   <tr key={idx} className="border-b border-gray-800/50 hover:bg-gray-700/30 transition-colors">
                     <td className="py-3 px-4">
-                      <span className="font-bold text-aquamarine-400">{forecast.Ticker}</span>
+                      <button
+                        onClick={() => onTickerClick?.(forecast.Ticker)}
+                        className="font-bold text-aquamarine-400 hover:text-aquamarine-300 hover:underline cursor-pointer transition-colors"
+                      >
+                        {forecast.Ticker}
+                      </button>
                     </td>
                     <td className="py-3 px-4 text-gray-300">{formatDate(forecast.Date)}</td>
                     <td className="py-3 px-4">

@@ -1,17 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, TrendingUp, TrendingDown, DollarSign, Activity, AlertCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
 
-export default function TickerAnalyzer() {
-  const [ticker, setTicker] = useState('');
+interface TickerAnalyzerProps {
+  initialTicker?: string;
+}
+
+export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
+  const [ticker, setTicker] = useState(initialTicker || '');
   const [loading, setLoading] = useState(false);
   const [stockData, setStockData] = useState<any>(null);
   const [error, setError] = useState('');
 
-  const analyzeStock = async () => {
-    if (!ticker) return;
+  const analyzeStock = async (tickerToAnalyze?: string) => {
+    const tickerValue = tickerToAnalyze || ticker;
+    if (!tickerValue) return;
     
     setLoading(true);
     setError('');
@@ -20,7 +25,7 @@ export default function TickerAnalyzer() {
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticker: ticker.toUpperCase() }),
+        body: JSON.stringify({ ticker: tickerValue.toUpperCase() }),
       });
       
       if (!response.ok) throw new Error('Failed to analyze stock');
@@ -33,6 +38,35 @@ export default function TickerAnalyzer() {
       setLoading(false);
     }
   };
+
+  // Auto-analyze when initialTicker changes
+  useEffect(() => {
+    if (initialTicker) {
+      setTicker(initialTicker);
+      const tickerValue = initialTicker.toUpperCase();
+      
+      setLoading(true);
+      setError('');
+      
+      fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker: tickerValue }),
+      })
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to analyze stock');
+          return res.json();
+        })
+        .then(data => {
+          setStockData(data);
+          setLoading(false);
+        })
+        .catch((err: any) => {
+          setError(err.message || 'Failed to analyze stock');
+          setLoading(false);
+        });
+    }
+  }, [initialTicker]);
 
   return (
     <div className="space-y-6">

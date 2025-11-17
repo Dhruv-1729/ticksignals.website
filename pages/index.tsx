@@ -10,6 +10,7 @@ import ManualScanTrigger from '../components/ManualScanTrigger';
 export default function Home() {
   const [activeTab, setActiveTab] = useState('analyzer');
   const [activeSignals, setActiveSignals] = useState(0);
+  const [selectedTicker, setSelectedTicker] = useState<string>('');
 
   useEffect(() => {
     // Fetch active signals count
@@ -18,6 +19,11 @@ export default function Home() {
       .then(data => setActiveSignals(data.activeSignals))
       .catch(err => console.error('Failed to fetch stats:', err));
   }, []);
+
+  const handleTickerClick = (ticker: string) => {
+    setSelectedTicker(ticker);
+    setActiveTab('analyzer');
+  };
 
   const tabs = [
     { id: 'analyzer', label: 'Ticker Analyzer', icon: Search },
@@ -90,9 +96,9 @@ export default function Home() {
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="animate-slide-up">
-            {activeTab === 'analyzer' && <TickerAnalyzer />}
-            {activeTab === 'signals' && <SignalsHistory />}
-            {activeTab === 'forecast' && <ForecastHistory />}
+            {activeTab === 'analyzer' && <TickerAnalyzer initialTicker={selectedTicker} />}
+            {activeTab === 'signals' && <SignalsHistory onTickerClick={handleTickerClick} />}
+            {activeTab === 'forecast' && <ForecastHistory onTickerClick={handleTickerClick} />}
           </div>
         </div>
 
