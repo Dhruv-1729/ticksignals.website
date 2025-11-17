@@ -248,8 +248,8 @@ export default function CustomTickerUpload({ triggerButton, compact = false }: C
 
       {/* Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-gray-800 rounded-xl border border-gray-700 max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-slide-up">
+        <div className="fixed inset-0 z-50 flex items-center justify-start bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-gray-800 rounded-xl border border-gray-700 max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-slide-up ml-[10%]">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-700">
               <div className="flex items-center gap-3">
