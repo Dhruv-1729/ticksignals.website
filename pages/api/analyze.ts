@@ -44,10 +44,7 @@ export default async function handler(
     const yAxisMin = Math.max(0, minPrice - priceRange * 0.1); // Don't go below 0
     const yAxisMax = maxPrice + priceRange * 0.1;
     
-    // Calculate date constraints (10 years ago to now)
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 10);
+    // Calculate date constraints (10 years ago to now) - reuse existing dates
     const minDate = startDate.toISOString().split('T')[0];
     const maxDate = endDate.toISOString().split('T')[0];
     
