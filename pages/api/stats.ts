@@ -20,6 +20,7 @@ export default async function handler(
     const result = await client.query(`
       SELECT COUNT(DISTINCT "Ticker") as count
       FROM all_signals
+      WHERE "Date" >= CURRENT_DATE - INTERVAL '60 days'
     `);
     
     await client.end(); // <-- Disconnect
