@@ -31,7 +31,7 @@ export default async function handler(
         "Volume_Trend_%",
         "Convergence_Rate"
       FROM forecast_signals 
-      WHERE "Date" >= CURRENT_DATE - INTERVAL '7 days'
+      WHERE "Date" >= CURRENT_DATE - INTERVAL '30 days'
       ORDER BY "Date" DESC, "Confidence_%" DESC 
       LIMIT 100
     `);
