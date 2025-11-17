@@ -13,7 +13,6 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
   const [loading, setLoading] = useState(false);
   const [stockData, setStockData] = useState<any>(null);
   const [error, setError] = useState('');
-  const [chartLayout, setChartLayout] = useState<any>(null);
 
   const analyzeStock = async (tickerToAnalyze?: string) => {
     const tickerValue = tickerToAnalyze || ticker;
@@ -21,7 +20,6 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
     
     setLoading(true);
     setError('');
-    setChartLayout(null); // Reset chart layout for new ticker
     
     try {
       const response = await fetch('/api/analyze', {
@@ -61,42 +59,6 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
         })
         .then(data => {
           setStockData(data);
-          if (data.chart?.layout) {
-            // Calculate initial y-axis range based on visible data (last 1 year default)
-            const xRange = data.chart.layout.xaxis?.range;
-            if (xRange && data.chart.data[0]?.x && data.chart.data[0]?.y) {
-              const dates = data.chart.data[0].x as string[];
-              const prices = data.chart.data[0].y as number[];
-              const visiblePrices: number[] = [];
-              
-              dates.forEach((date, idx) => {
-                const dateObj = new Date(date);
-                if (dateObj >= new Date(xRange[0]) && dateObj <= new Date(xRange[1])) {
-                  visiblePrices.push(prices[idx]);
-                }
-              });
-              
-              if (visiblePrices.length > 0) {
-                const minPrice = Math.min(...visiblePrices);
-                const maxPrice = Math.max(...visiblePrices);
-                const priceRange = maxPrice - minPrice;
-                const padding = Math.max(priceRange * 0.1, maxPrice * 0.02);
-                
-                setChartLayout({
-                  ...data.chart.layout,
-                  yaxis: {
-                    ...data.chart.layout.yaxis,
-                    range: [Math.max(0, minPrice - padding), maxPrice + padding],
-                    autorange: false,
-                  },
-                });
-              } else {
-                setChartLayout(data.chart.layout);
-              }
-            } else {
-              setChartLayout(data.chart.layout);
-            }
-          }
           setLoading(false);
         })
         .catch((err: any) => {
@@ -105,45 +67,6 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
         });
     }
   }, [initialTicker]);
-  
-  // Calculate initial y-axis when stockData changes
-  useEffect(() => {
-    if (stockData?.chart?.layout && !chartLayout) {
-      const xRange = stockData.chart.layout.xaxis?.range;
-      if (xRange && stockData.chart.data[0]?.x && stockData.chart.data[0]?.y) {
-        const dates = stockData.chart.data[0].x as string[];
-        const prices = stockData.chart.data[0].y as number[];
-        const visiblePrices: number[] = [];
-        
-        dates.forEach((date, idx) => {
-          const dateObj = new Date(date);
-          if (dateObj >= new Date(xRange[0]) && dateObj <= new Date(xRange[1])) {
-            visiblePrices.push(prices[idx]);
-          }
-        });
-        
-        if (visiblePrices.length > 0) {
-          const minPrice = Math.min(...visiblePrices);
-          const maxPrice = Math.max(...visiblePrices);
-          const priceRange = maxPrice - minPrice;
-          const padding = Math.max(priceRange * 0.1, maxPrice * 0.02);
-          
-          setChartLayout({
-            ...stockData.chart.layout,
-            yaxis: {
-              ...stockData.chart.layout.yaxis,
-              range: [Math.max(0, minPrice - padding), maxPrice + padding],
-              autorange: false,
-            },
-          });
-        } else {
-          setChartLayout(stockData.chart.layout);
-        }
-      } else {
-        setChartLayout(stockData.chart.layout);
-      }
-    }
-  }, [stockData, chartLayout]);
 
   return (
     <div className="space-y-6">
@@ -222,7 +145,7 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
             <div className="bg-gray-900/50 rounded-lg p-2 -mx-2">
               <Plot
                 data={stockData.chart.data}
-                layout={chartLayout || {
+                layout={{
                   ...stockData.chart.layout,
                   paper_bgcolor: 'rgba(17, 24, 39, 0)',
                   plot_bgcolor: 'rgba(17, 24, 39, 0)',
@@ -237,7 +160,6 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
                     spikethickness: 1.5,
                     spikemode: 'toaxis',
                     spikedash: 'solid',
-                    type: 'date',
                   },
                   yaxis: {
                     ...stockData.chart.layout?.yaxis,
@@ -245,10 +167,9 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
                     showgrid: true,
                     zeroline: false,
                     showspikes: false,
-                    autorange: true,
-                    fixedrange: false,
+                    autorange: true, // Auto-scale y-axis based on visible data
                   },
-                  margin: { l: 70, r: 30, t: 30, b: 60 },
+                  margin: { l: 60, r: 30, t: 30, b: 60 },
                   hovermode: 'x unified',
                   dragmode: 'pan',
                   hoverlabel: {
@@ -269,78 +190,6 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
                   doubleClick: 'reset',
                 }}
                 style={{ width: '100%', height: '500px' }}
-                onRelayout={(event) => {
-                  if (!stockData?.chart?.layout?._constraints) return;
-                  
-                  const constraints = stockData.chart.layout._constraints;
-                  const updatedLayout: any = { ...chartLayout };
-                  let needsUpdate = false;
-                  
-                  // Constrain x-axis dates
-                  if (event['xaxis.range[0]'] || event['xaxis.range[1]']) {
-                    const xMin = event['xaxis.range[0]'] ? new Date(event['xaxis.range[0]']) : new Date(constraints.xMin);
-                    const xMax = event['xaxis.range[1]'] ? new Date(event['xaxis.range[1]']) : new Date(constraints.xMax);
-                    const constraintMin = new Date(constraints.xMin);
-                    const constraintMax = new Date(constraints.xMax);
-                    
-                    let constrainedMin = xMin;
-                    let constrainedMax = xMax;
-                    
-                    if (xMin < constraintMin) {
-                      constrainedMin = constraintMin;
-                      needsUpdate = true;
-                    }
-                    if (xMax > constraintMax) {
-                      constrainedMax = constraintMax;
-                      needsUpdate = true;
-                    }
-                    
-                    if (needsUpdate) {
-                      updatedLayout.xaxis = {
-                        ...updatedLayout.xaxis,
-                        range: [constrainedMin.toISOString().split('T')[0], constrainedMax.toISOString().split('T')[0]],
-                      };
-                    }
-                  }
-                  
-                  // Auto-adjust y-axis based on visible data
-                  if (event['xaxis.range[0]'] || event['xaxis.range[1]'] || !chartLayout) {
-                    const xRange = updatedLayout.xaxis?.range || stockData.chart.layout.xaxis.range;
-                    if (xRange && stockData.chart.data[0]?.x && stockData.chart.data[0]?.y) {
-                      const dates = stockData.chart.data[0].x as string[];
-                      const prices = stockData.chart.data[0].y as number[];
-                      
-                      const visiblePrices: number[] = [];
-                      dates.forEach((date, idx) => {
-                        const dateObj = new Date(date);
-                        if (dateObj >= new Date(xRange[0]) && dateObj <= new Date(xRange[1])) {
-                          visiblePrices.push(prices[idx]);
-                        }
-                      });
-                      
-                      if (visiblePrices.length > 0) {
-                        const minPrice = Math.min(...visiblePrices);
-                        const maxPrice = Math.max(...visiblePrices);
-                        const priceRange = maxPrice - minPrice;
-                        const padding = Math.max(priceRange * 0.1, maxPrice * 0.02); // At least 2% padding
-                        
-                        updatedLayout.yaxis = {
-                          ...updatedLayout.yaxis,
-                          range: [
-                            Math.max(0, minPrice - padding),
-                            maxPrice + padding
-                          ],
-                          autorange: false,
-                        };
-                        needsUpdate = true;
-                      }
-                    }
-                  }
-                  
-                  if (needsUpdate) {
-                    setChartLayout(updatedLayout);
-                  }
-                }}
               />
             </div>
           </div>
