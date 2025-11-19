@@ -37,6 +37,23 @@ export default async function handler(
     const chartDates = historicalData.map((d: any) => d.date.toISOString().split('T')[0]);
     const chartPrices = historicalData.map((d: any) => d.close);
     
+    // Calculate SMA 50 and SMA 200
+    const calculateSMA = (prices: number[], period: number): number[] => {
+      const sma: number[] = [];
+      for (let i = 0; i < prices.length; i++) {
+        if (i < period - 1) {
+          sma.push(NaN); // Not enough data points
+        } else {
+          const sum = prices.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
+          sma.push(sum / period);
+        }
+      }
+      return sma;
+    };
+    
+    const sma50 = calculateSMA(chartPrices, 50);
+    const sma200 = calculateSMA(chartPrices, 200);
+    
     // Calculate price range for y-axis (with 10% padding)
     const minPrice = Math.min(...chartPrices);
     const maxPrice = Math.max(...chartPrices);
@@ -175,6 +192,26 @@ export default async function handler(
             line: { color: '#14b8a6', width: 2 },
             hovertemplate: '<b>%{fullData.name}</b><br>Date: %{x}<br>Price: $%{y:.2f}<extra></extra>',
           },
+          // SMA 50 (Blue)
+          {
+            x: chartDates,
+            y: sma50,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'SMA 50',
+            line: { color: '#3b82f6', width: 1.5 },
+            hovertemplate: '<b>SMA 50</b><br>Date: %{x}<br>Price: $%{y:.2f}<extra></extra>',
+          },
+          // SMA 200 (Yellow)
+          {
+            x: chartDates,
+            y: sma200,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'SMA 200',
+            line: { color: '#eab308', width: 1.5 },
+            hovertemplate: '<b>SMA 200</b><br>Date: %{x}<br>Price: $%{y:.2f}<extra></extra>',
+          },
           // Buy signals (green up arrows)
           ...(buySignals.length > 0 ? [{
             x: buySignals.map((s: any) => s.date),
@@ -217,9 +254,9 @@ export default async function handler(
           xaxis: { 
             title: 'Date',
             type: 'date',
-            // Default to showing last 1 year
+            // Default to showing last ~8 months to shift right and show current date better
             range: chartDates.length > 0 ? [
-              chartDates[Math.max(0, chartDates.length - 252)], // ~1 year ago (252 trading days)
+              chartDates[Math.max(0, chartDates.length - 180)], // ~8 months ago (180 trading days)
               chartDates[chartDates.length - 1] // Today
             ] : undefined,
             // Constrain to 10 years max

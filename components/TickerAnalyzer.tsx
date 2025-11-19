@@ -179,13 +179,22 @@ export default function TickerAnalyzer({ initialTicker }: TickerAnalyzerProps) {
                     align: 'left',
                     namelength: -1,
                   },
-                  showlegend: false,
+                  showlegend: true,
+                  legend: {
+                    x: 1,
+                    y: 0,
+                    xanchor: 'right',
+                    yanchor: 'bottom',
+                    bgcolor: 'rgba(17, 24, 39, 0.8)',
+                    bordercolor: '#374151',
+                    borderwidth: 1,
+                    font: { color: '#9CA3AF', family: 'Inter, sans-serif', size: 11 },
+                  },
                 }}
                 config={{ 
                   responsive: true,
-                  displayModeBar: true,
+                  displayModeBar: false, // Hide the entire modebar
                   displaylogo: false,
-                  modeBarButtonsToRemove: ['lasso2d', 'select2d'],
                   scrollZoom: true,
                   doubleClick: 'reset',
                 }}
